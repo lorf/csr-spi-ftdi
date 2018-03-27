@@ -456,9 +456,9 @@ static int spifns_sequence_read(unsigned short nAddress, unsigned short nLength,
                 "Unable to start read (getting control data)");
 
     if (inbuf1[0] != 3 || inbuf1[1] != (nAddress >> 8)) {
+        LOG(ERR, "Control data: 0x%02x 0x%02x", inbuf1[0], inbuf1[1]);
         _ERR_RETURN(SPIERR_READ_FAILED,
                 "Unable to start read (invalid control data)");
-        LOG(ERR, "Control data: 0x%02x 0x%02x", inbuf1[0], inbuf1[1]);
     }
 
     if (spi_xfer(SPI_XFER_READ, 16, pnOutput, nLength) < 0) {
