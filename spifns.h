@@ -170,7 +170,7 @@ DLLEXPORT const char* spifns_command(const char *szCmd); //Return 0 on no error,
 /* get_last_error and clear_last_error both deal with the error that occurred in the current thread */
 DLLEXPORT unsigned int spifns_get_last_error(unsigned short *pnErrorAddress, const char **szErrorString); //Returns where the error occured, or 0x100 for none
 DLLEXPORT int spifns_bluecore_xap_stopped(); //Returns -1 on error, 0 on XAP running, 1 on stopped
-DLLEXPORT int spifns_sequence(SPISEQ *pSequence, unsigned int nCount); //Return 0 on no error
+DLLEXPORT int spifns_sequence(void *pSequence, unsigned int nCount); //Return 0 on no error
 DLLEXPORT void spifns_set_debug_callback(spifns_debug_callback pCallback);
 DLLEXPORT void spifns_clear_last_error(void);
 
@@ -212,7 +212,7 @@ DLLEXPORT unsigned int spifns_count_streams(void);
 DLLEXPORT int spifns_stream_init(spifns_stream_t *p_stream);
 DLLEXPORT void spifns_stream_close(spifns_stream_t stream);
 DLLEXPORT unsigned int spifns_count_streams(void);
-DLLEXPORT int spifns_stream_sequence(spifns_stream_t stream, SPISEQ_1_4 *pSequence, int nCount);
+DLLEXPORT int spifns_stream_sequence(spifns_stream_t stream, void *pSequence, int nCount);
 DLLEXPORT const char* spifns_stream_command(spifns_stream_t stream, const char *command);
 DLLEXPORT const char* spifns_stream_getvar(spifns_stream_t stream, const char *var);
 DLLEXPORT void spifns_stream_chip_select(spifns_stream_t stream, int which);
