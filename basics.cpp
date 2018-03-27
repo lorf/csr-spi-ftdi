@@ -485,35 +485,64 @@ error:
     return 1;
 }
 
-DLLEXPORT int spifns_sequence(SPISEQ *pSequence, unsigned int nCount) {
+DLLEXPORT int spifns_sequence(void *pSequence, unsigned int nCount) {
     int nRetval=0;
+    SPISEQ *pSequence13 = (SPISEQ *)pSequence;
+    SPISEQ_1_4 *pSequence14 = (SPISEQ_1_4 *)pSequence;
 
     LOG(DEBUG, "(%p, %d)", pSequence, nCount);
 
-    while (nCount--) {
-        LOG(DEBUG, "command %d", pSequence->nType);
-        switch (pSequence->nType) {
-        case SPISEQ::TYPE_READ:{
-            if (spifns_sequence_read(pSequence->rw.nAddress,pSequence->rw.nLength,pSequence->rw.pnData)==1)
-                nRetval=1;
-                               }break;
-        case SPISEQ::TYPE_WRITE:{
-            if (spifns_sequence_write(pSequence->rw.nAddress,pSequence->rw.nLength,pSequence->rw.pnData)==1)
-                nRetval=1;
+    if (spifns_api_version == SPIFNS_API_1_3) {
+        while (nCount--) {
+            LOG(DEBUG, "command %d", pSequence13->nType);
+            switch (pSequence13->nType) {
+            case SPISEQ::TYPE_READ:{
+                if (spifns_sequence_read(pSequence13->rw.nAddress,pSequence13->rw.nLength,pSequence13->rw.pnData)==1)
+                    nRetval=1;
                                 }break;
-        case SPISEQ::TYPE_SETVAR:{
-            if (spifns_sequence_setvar(pSequence->setvar.szName,pSequence->setvar.szValue)==1)
-                nRetval=1;
-                                 }break;
-        default:
-            LOG(WARN, "Sequence command not implemented: %d", pSequence->nType);
-            g_nError = SPIFNS_ERROR_INVALID_PARAMETER;
-            snprintf(g_szErrorString, sizeof(g_szErrorString),
-                    "sequence command %d not implemented", pSequence->nType);
-            nRetval = 1;
+            case SPISEQ::TYPE_WRITE:{
+                if (spifns_sequence_write(pSequence13->rw.nAddress,pSequence13->rw.nLength,pSequence13->rw.pnData)==1)
+                    nRetval=1;
+                                    }break;
+            case SPISEQ::TYPE_SETVAR:{
+                if (spifns_sequence_setvar(pSequence13->setvar.szName,pSequence13->setvar.szValue)==1)
+                    nRetval=1;
+                                    }break;
+            default:
+                LOG(WARN, "Sequence command not implemented: %d", pSequence13->nType);
+                g_nError = SPIFNS_ERROR_INVALID_PARAMETER;
+                snprintf(g_szErrorString, sizeof(g_szErrorString),
+                        "sequence command %d not implemented", pSequence13->nType);
+                nRetval = 1;
 
+            }
+            pSequence13++;
         }
-        pSequence++;
+    } else if (spifns_api_version == SPIFNS_API_1_4) {
+        while (nCount--) {
+            LOG(DEBUG, "command %d", pSequence14->nType);
+            switch (pSequence14->nType) {
+            case SPISEQ_1_4::TYPE_READ:
+                if (spifns_sequence_read(pSequence14->rw.nAddress,pSequence14->rw.nLength,pSequence14->rw.pnData)==1)
+                    nRetval=1;
+                break;
+            case SPISEQ_1_4::TYPE_WRITE:
+                if (spifns_sequence_write(pSequence14->rw.nAddress,pSequence14->rw.nLength,pSequence14->rw.pnData)==1)
+                    nRetval=1;
+                break;
+            case SPISEQ_1_4::TYPE_SETVAR:
+                if (spifns_sequence_setvar(pSequence14->setvar.szName,pSequence14->setvar.szValue)==1)
+                    nRetval=1;
+                break;
+            default:
+                LOG(WARN, "Sequence command not implemented: %d", pSequence14->nType);
+                g_nError = SPIFNS_ERROR_INVALID_PARAMETER;
+                snprintf(g_szErrorString, sizeof(g_szErrorString),
+                        "sequence command %d not implemented", pSequence14->nType);
+                nRetval = 1;
+            }
+            pSequence14++;
+        }
     }
     return nRetval;
 }
@@ -584,37 +613,11 @@ DLLEXPORT unsigned int spifns_count_streams(void)
     return NSTREAMS;
 }
 
-DLLEXPORT int spifns_stream_sequence(spifns_stream_t stream, SPISEQ_1_4 *pSequence, int nCount)
+DLLEXPORT int spifns_stream_sequence(spifns_stream_t stream, void *pSequence, int nCount)
 {
-    int nRetval=0;
-
     LOG(DEBUG, "(%d, %p, %d)", stream, pSequence, nCount);
 
-    while (nCount--) {
-        LOG(DEBUG, "command %d", pSequence->nType);
-        switch (pSequence->nType) {
-        case SPISEQ_1_4::TYPE_READ:
-            if (spifns_sequence_read(pSequence->rw.nAddress,pSequence->rw.nLength,pSequence->rw.pnData)==1)
-                nRetval=1;
-            break;
-        case SPISEQ_1_4::TYPE_WRITE:
-            if (spifns_sequence_write(pSequence->rw.nAddress,pSequence->rw.nLength,pSequence->rw.pnData)==1)
-                nRetval=1;
-            break;
-        case SPISEQ_1_4::TYPE_SETVAR:
-            if (spifns_sequence_setvar(pSequence->setvar.szName,pSequence->setvar.szValue)==1)
-                nRetval=1;
-            break;
-        default:
-            LOG(WARN, "Sequence command not implemented: %d", pSequence->nType);
-            g_nError = SPIFNS_ERROR_INVALID_PARAMETER;
-            snprintf(g_szErrorString, sizeof(g_szErrorString),
-                    "sequence command %d not implemented", pSequence->nType);
-            nRetval = 1;
-        }
-        pSequence++;
-    }
-    return nRetval;
+    return spifns_sequence(pSequence, nCount);
 }
 
 DLLEXPORT const char* spifns_stream_command(spifns_stream_t stream, const char *command)
