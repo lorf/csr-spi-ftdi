@@ -402,6 +402,8 @@ static int spifns_sequence_setvar(const char *szName, const char *szValue) {
                         pinout = SPI_PINOUT_HWSPI_LEDS;
                     } else if (!stricmp(szValue, "hwspi")) {
                         pinout = SPI_PINOUT_HWSPI;
+                    } else if (!stricmp(szValue, "sparkfun")) {
+                        pinout = SPI_PINOUT_SPARKFUN;
                     } else {
                         const char szError[]="Invalid pinout specified in FTDI_PINOUT";
                         memcpy(g_szErrorString,szError,sizeof(szError));
