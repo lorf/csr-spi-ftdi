@@ -340,7 +340,7 @@ Install build tools:
 
 Install development libraries:
 
-    sudo apt-get install -y wine-dev libc6-dev libstdc++-dev libftdi-dev
+    sudo apt-get install -y wine-dev libc6-dev libstdc++-dev libftdi1-dev libudev-dev
 
 Build with command:
 
@@ -355,7 +355,7 @@ Install build tools:
 
 Install 32 bit stuff:
 
-    sudo apt-get install -y wine-dev:i386 libc6-dev-i386 libstdc++-dev:i386 libftdi-dev:i386
+    sudo apt-get install -y wine-dev:i386 libc6-dev-i386 libstdc++-dev:i386 libftdi1-dev:i386 libudev-dev:i386
 
 Build with command:
 
