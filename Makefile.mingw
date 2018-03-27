@@ -10,6 +10,8 @@ LIBUSB ?=	./libusb
 CPPFLAGS +=	-DSPI_STATS
 # Enable LEDs
 CPPFLAGS += -DENABLE_LEDS
+# FT230X support is available since libftdi-1.1
+CPPFLAGS += -DENABLE_FT230X
 
 # Fixes compilation on Debian/Ubuntu with mingw-w64 < 3.0.
 # See: http://sourceforge.net/p/mingw-w64/mailman/mingw-w64-public/thread/4F8CA26A.70103@users.sourceforge.net/
