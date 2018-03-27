@@ -546,6 +546,8 @@ int spi_set_interface(const char *intf)
 
 int spi_init(void)
 {
+    struct ftdi_version_info fv;
+
     LOG(DEBUG, "spi_nrefs=%d, spi_dev_open=%d", spi_nrefs, spi_dev_open);
 
     spi_nrefs++;
@@ -555,7 +557,10 @@ int spi_init(void)
         return 0;
     }
 
-    LOG(ALL, "csr-spi-ftdi " VERSION ", git rev " GIT_REVISION);
+    fv = ftdi_get_library_version();
+    LOG(ALL, "csr-spi-ftdi " VERSION ", git rev " GIT_REVISION ", libftdi %s-%s",
+		fv.version_str, fv.snapshot_str);
+
 
     if (ftdi_init(&ftdic) < 0) {
         SPI_ERR("FTDI: init failed");
@@ -867,6 +872,7 @@ int spi_isopen(void)
 #ifdef SPI_STATS
 void spi_output_stats(void)
 {
+    struct ftdi_version_info fv;
     double xfer_pct = NAN, avg_read = NAN, avg_write = NAN, rate = NAN, iops = NAN;
     double ftdi_rate = NAN, ftdi_xfers_per_io = NAN, avg_ftdi_xfer = NAN, ftdi_short_rate = NAN;
     struct timeval tv;
@@ -876,6 +882,8 @@ void spi_output_stats(void)
     fp = log_get_dest();
     if (!fp)
         return;
+
+    fv = ftdi_get_library_version();
 
     /* Calculate timeranges until now */
     if (gettimeofday(&tv, NULL) < 0)
@@ -924,6 +932,7 @@ void spi_output_stats(void)
     fprintf(fp,
             "*** FTDI Statistics ********************************************************\n"
             "csr-spi-ftdi version: " VERSION " (git rev " GIT_REVISION ")\n"
+            "libftdi version: %s-%s\n"
             "Time open: %ld.%02ld s\n"
             "Time in xfer: %ld.%02ld s (%.2f%% of open time)\n"
             "Reads: %ld (%ld bytes, %.2f bytes avg read size)\n"
@@ -936,6 +945,7 @@ void spi_output_stats(void)
             "            %.2f xfers/IO, %.2f bytes/xfer)\n"
             "SPI max clock: %lu kHz, min clock: %lu kHz, slowdowns: %lu\n"
             "****************************************************************************\n",
+            fv.version_str, fv.snapshot_str,
             spi_stats.tv_open.tv_sec, spi_stats.tv_open.tv_usec / 10000,
             spi_stats.tv_xfer.tv_sec, spi_stats.tv_xfer.tv_usec / 10000, xfer_pct,
             spi_stats.reads, spi_stats.read_bytes, avg_read,

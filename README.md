@@ -340,7 +340,7 @@ Install build tools:
 
 Install development libraries:
 
-    sudo apt-get install -y wine-dev libc6-dev libstdc++-dev libftdi-dev
+    sudo apt-get install -y wine-dev libc6-dev libstdc++-dev libftdi1-dev libudev-dev
 
 Build with command:
 
@@ -355,7 +355,7 @@ Install build tools:
 
 Install 32 bit stuff:
 
-    sudo apt-get install -y wine-dev:i386 libc6-dev-i386 libstdc++-dev:i386 libftdi-dev:i386
+    sudo apt-get install -y wine-dev:i386 libc6-dev-i386 libstdc++-dev:i386 libftdi1-dev:i386 libudev-dev:i386
 
 Build with command:
 
@@ -388,14 +388,14 @@ Download [precompiled libusb for
 windows](http://sourceforge.net/projects/libusb/files/) and extract it to the
 libusb directory:
 
-    wget https://sourceforge.net/projects/libusb/files/libusb-1.0/libusb-1.0.20/libusb-1.0.20.7z
-    7z x -olibusb libusb-1.0.20.7z
+    wget https://sourceforge.net/projects/libusb/files/libusb-1.0/libusb-1.0.22/libusb-1.0.22.7z
+    7z x -olibusb libusb-1.0.22.7z
 
 Build [libftdi](http://www.intra2net.com/en/developer/libftdi/) from source:
 
-    wget http://www.intra2net.com/en/developer/libftdi/download/libftdi1-1.2.tar.bz2
-    tar xjvf libftdi1-1.2.tar.bz2
-    cd libftdi1-1.2
+    wget http://www.intra2net.com/en/developer/libftdi/download/libftdi1-1.4.tar.bz2
+    tar xjvf libftdi1-1.4.tar.bz2
+    cd libftdi1-1.4
     cmake -DCMAKE_TOOLCHAIN_FILE=cmake/Toolchain-i686-w64-mingw32.cmake \
         -DLIBUSB_INCLUDE_DIR=../libusb/include/libusb-1.0 \
         -DLIBUSB_LIBRARIES="-L../../libusb/MinGW32/static -lusb-1.0" \
