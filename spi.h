@@ -66,11 +66,23 @@ struct spi_pins {
 #define SPI_PIN_PRESET_HWSPI \
     { (1 << 3), (1 << 0), (1 << 1), (1 << 2), 0, 0 }
 
+/*
+ * Pinout for Sparkfun FTDI-Basic breakout board.
+ * Ref: https://cdn.sparkfun.com/datasheets/BreakoutBoards/FTDI%20Basic-v22-3.3V.pdf
+ * CS   - CTS# (D3)
+ * CLK  - TXD  (D0)
+ * MOSI - RXD  (D1)
+ * MISO - DTR#  (D4)
+ */
+#define SPI_PIN_PRESET_SPARKFUN \
+	{ (1 << 3), (1 << 0), (1 << 1), (1 << 4), 0, 0 }
+
 #define SPI_PIN_PRESETS { \
         SPI_PIN_PRESET_DEFAULT, \
         SPI_PIN_PRESET_NOLEDS, \
         SPI_PIN_PRESET_HWSPI_LEDS, \
         SPI_PIN_PRESET_HWSPI, \
+        SPI_PIN_PRESET_SPARKFUN, \
     }
 
 enum spi_pinouts {
@@ -78,6 +90,7 @@ enum spi_pinouts {
     SPI_PINOUT_NOLEDS,
     SPI_PINOUT_HWSPI_LEDS,
     SPI_PINOUT_HWSPI,
+    SPI_PINOUT_SPARKFUN,
 };
 
 #ifdef __cplusplus

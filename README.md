@@ -259,6 +259,11 @@ variables or using the -TRANS option to most CSR commandline apps.
     `MOSI` - `RXD` (`D1`), `MISO` - `RTS#` (`D2`).
   * `hwspi+leds` - this is the same as `hwspi` but adds read and write LEDs on
     `DTR#` (`D4`) and `DSR#` (`D5`) pins respectively.
+  * `sparkfun` - pinout for use with adapters with TX, RX, DTR and CTS
+    signals brougth out, such as
+    [Sparkfun FTDI Basic breakout board](https://cdn.sparkfun.com/datasheets/BreakoutBoards/FTDI%20Basic-v22-3.3V.pdf):
+	`CS` - `CTS#` (`D3`), `CLK` - `TXD` (`D0`), `MOSI` - `RXD` (`D1`), `MISO` -
+    `DTR#` (`D4`).
 
 For other options see [misc/transport-options.md](misc/transport-options.md).
 
