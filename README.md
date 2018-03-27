@@ -6,6 +6,7 @@
    * [Programmer hardware](#programmer-hardware)
       * [Using FT232RL breakout board as a programmer](#using-ft232rl-breakout-board-as-a-programmer)
       * [Dedicated programmer](#dedicated-programmer)
+      * [Supported FTDI chips](#supported-ftdi-chips)
       * [Counterfeit FT232RL chips](#counterfeit-ft232rl-chips)
    * [Software](#software)
       * [CSR software](#csr-software)
@@ -71,9 +72,8 @@ Programmer was tested with the following chips:
 
 ## Programmer hardware
 
-Programmer hardware is based on FT232R chip. It is possible that later
-generation FTDI chips, such as FT2232C/D/H or FT232H, will also work, but this
-was not tested.
+Programmer hardware is based on FT232R chip. It is possible to use later
+generation FTDI chips, see [Supported FTDI chips](#supported-ftdi-chips).
 
 ### Using FT232RL breakout board as a programmer
 
@@ -118,6 +118,18 @@ Also see notes on [Counterfeit FT232RL chips](#counterfeit-ft232rl-chips).
 
 KiCad schematic for a dedicated programmer can be found in
 [hardware/](hardware/) subdirectory.
+
+### Supported FTDI chips
+
+The following FTDI chips are reported working with programmer driver: FT232R
+(including counterfeits, even "bricked" ones), FT2232H, FT4232H. There is
+experimental support for the following chips: FT2232C, FT2232D, FT232H, FT220X,
+FT221X, FT230X, FT231X, FT234XD, FT240X. Please report the working status via
+[GitHub issues](https://github.com/lorf/csr-spi-ftdi/issues).
+
+Some FT-X family chips (FT220X, FT230X, FT234XD) have only four primary GPIO
+pins and don't support default pinout. To use such chip You'll need to set
+`hwspi` pinout using `FTDI_PINOUT` [option](#options).
 
 ### Counterfeit FT232RL chips
 
@@ -238,15 +250,15 @@ variables or using the -TRANS option to most CSR commandline apps.
   * `default` - default pinout as described in [Using FT232RL breakout board as
     a programmer](#using-ft232rl-breakout-board-as-a-programmer).
   * `noleds` - this is the same as `default` but without LEDs.
-  * `hwspi` - pinout for use with MPSSE chips (FT2232, FT4232, FT232H), uses
-    the same pins as hardware SPI. Note that hardware SPI capability is not
-    used, just the same pinout is used for convenience. This pinout can be used
-    with adapters like [TIAO
-    TUMPA](http://www.tiaowiki.com/w/TIAO_USB_Multi_Protocol_Adapter_User's_Manual).
-    The pinout is as follows: `CS` - `DBUS3`, `CLK` - `DBUS0`, `MOSI` -
-    `DBUS1`, `MISO` - `DBUS2`.
+  * `hwspi` - pinout for use with MPSSE (FT2232, FT4232, FT232H) and FT-X
+    chips, uses the same pins as hardware SPI. Note that hardware SPI
+    capability is not used, just the same pinout is used for convenience. This
+    pinout can be used with adapters like
+    [TIAO TUMPA](http://www.tiaowiki.com/w/TIAO_USB_Multi_Protocol_Adapter_User's_Manual).
+    The pinout is as follows: `CS` - `CTS#` (`D3`), `CLK` - `TXD` (`D0`),
+    `MOSI` - `RXD` (`D1`), `MISO` - `RTS#` (`D2`).
   * `hwspi+leds` - this is the same as `hwspi` but adds read and write LEDs on
-    `DBUS4` and `DBUS5` pins respectively.
+    `DTR#` (`D4`) and `DSR#` (`D5`) pins respectively.
 
 For other options see [misc/transport-options.md](misc/transport-options.md).
 

@@ -10,6 +10,8 @@ STDCXX_LIB ?=	/usr/lib/gcc/i686-linux-gnu/$(WINEGCC_VER)
 CPPFLAGS +=	-DSPI_STATS
 # Enable LEDs
 CPPFLAGS += -DENABLE_LEDS
+# Support for FT-X family chips is available since libftdi-1.1
+CPPFLAGS += -DENABLE_FT_X
 CPPFLAGS += $(shell libftdi1-config --cflags) $(shell env PKG_CONFIG_PATH=$(I386_LIB)/pkgconfig pkg-config --cflags libusb-1.0)
 
 # Compile with debugging

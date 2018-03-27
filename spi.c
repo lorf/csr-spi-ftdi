@@ -47,7 +47,7 @@ static struct spi_stats {
 
 struct ftdi_device_ids {
     uint16_t vid, pid;
-    char name[10];
+    const char *name;
 };
 
 #define SPI_MAX_PORTS   16
@@ -63,7 +63,11 @@ static struct ftdi_device_ids ftdi_device_ids[] = {
     { 0x0403, 0x6010, "FT2232" }, /* FT2232H/C/D */
     { 0x0403, 0x6011, "FT4232" }, /* FT4232H */
     { 0x0403, 0x6014, "FT232H" }, /* FT232H */
-    /*{ 0x0403, 0x6015, "FT230X" },*/ /* FT230X, only since libftdi1-1.2 */
+#ifdef ENABLE_FT_X
+    /* FT-X family support is available since libftdi-1.1. This includes
+     * FT220X, FT221X, FT230X, FT231X, FT234XD and FT240X  */
+    { 0x0403, 0x6015, "FT-X FAMILY" }, /* FT-X family */
+#endif
 };
 
 static char *spi_err_buf = NULL;
@@ -71,7 +75,7 @@ static size_t spi_err_buf_sz = 0;
 
 static struct spi_pins *spi_pins;
 static struct spi_pins spi_pin_presets[] = SPI_PIN_PRESETS;
-static enum spi_pinouts spi_pinout = SPI_PINOUT_DEFAULT;
+static int spi_pinout_set = 0;
 
 void spi_set_err_buf(char *buf, size_t sz)
 {
@@ -519,7 +523,8 @@ static int spi_enumerate_ports(void)
 
 void spi_set_pinout(enum spi_pinouts pinout)
 {
-    spi_pinout = pinout;
+    spi_pins = &spi_pin_presets[pinout];
+    spi_pinout_set = 1;
 }
 
 int spi_set_interface(const char *intf)
@@ -572,8 +577,6 @@ int spi_init(void)
         spi_deinit();
         return -1;
     }
-
-    spi_pins = &spi_pin_presets[spi_pinout];
 
     return 0;
 }
@@ -738,43 +741,6 @@ int spi_open(int nport)
 
     LOG(INFO, "FTDI: using FTDI device: \"%s\"", spi_ports[nport].name);
 
-    rc = ftdi_usb_reset(&ftdic);
-    if (rc < 0) {
-        SPI_ERR("FTDI: reset failed: [%d] %s", rc, ftdi_get_error_string(&ftdic));
-        goto open_err;
-    }
-
-    rc = ftdi_usb_purge_buffers(&ftdic);
-    if (rc < 0) {
-        SPI_ERR("FTDI: purge buffers failed: [%d] %s", rc, ftdi_get_error_string(&ftdic));
-        goto open_err;
-    }
-
-    /* Set 1 ms latency timer, see FTDI AN232B-04 */
-    rc = ftdi_set_latency_timer(&ftdic, 1);
-    if (rc < 0) {
-        SPI_ERR("FTDI: setting latency timer failed: [%d] %s", rc, ftdi_get_error_string(&ftdic));
-        goto open_err;
-    }
-
-    rc = ftdi_set_bitmode(&ftdic, 0, BITMODE_RESET);
-    if (rc < 0) {
-        SPI_ERR("FTDI: reset bitmode failed: [%d] %s", rc, ftdi_get_error_string(&ftdic));
-        goto open_err;
-    }
-
-    /* Set pins direction */
-    output_pins = spi_pins->mosi | spi_pins->clk | spi_pins->ncs;
-    if (spi_pins->nledr)
-        output_pins |= spi_pins->nledr;
-    if (spi_pins->nledw)
-        output_pins |= spi_pins->nledw;
-    rc = ftdi_set_bitmode(&ftdic, output_pins, BITMODE_SYNCBB);
-    if (rc < 0) {
-        SPI_ERR("FTDI: set synchronous bitbang mode failed: [%d] %s", rc, ftdi_get_error_string(&ftdic));
-        goto open_err;
-    }
-
     /*
      * Note on buffer sizes:
      *
@@ -821,12 +787,17 @@ int spi_open(int nport)
             ftdi_type_str = "FT232H";
             ftdi_buf_size = 2048;
             break;
-        /* TYPE_230X is supported since libftdi1-1.2 */
-        /*case TYPE_230X:
-            ftdi_type_str = "FT230X";
+#ifdef ENABLE_FT_X
+        case TYPE_230X:
+            ftdi_type_str = "FT-X FAMILY";
             ftdi_buf_size = 1024;
+            /* Change default pinout if pinout was not set via spi_set_pinout() */
+            /*
+            if (!spi_pinout_set)
+                spi_set_pinout(SPI_PINOUT_HWSPI);
+            */
             break;
-        */
+#endif
         default:
             LOG(WARN, "Unknown FTDI chip type, assuming FT232R");
             ftdi_type_str = "Unknown";
@@ -836,6 +807,47 @@ int spi_open(int nport)
 
     LOG(INFO, "Detected %s type programmer chip, buffer size: %u",
             ftdi_type_str, ftdi_buf_size);
+
+    rc = ftdi_usb_reset(&ftdic);
+    if (rc < 0) {
+        SPI_ERR("FTDI: reset failed: [%d] %s", rc, ftdi_get_error_string(&ftdic));
+        goto open_err;
+    }
+
+    rc = ftdi_usb_purge_buffers(&ftdic);
+    if (rc < 0) {
+        SPI_ERR("FTDI: purge buffers failed: [%d] %s", rc, ftdi_get_error_string(&ftdic));
+        goto open_err;
+    }
+
+    /* Set 1 ms latency timer, see FTDI AN232B-04 */
+    rc = ftdi_set_latency_timer(&ftdic, 1);
+    if (rc < 0) {
+        SPI_ERR("FTDI: setting latency timer failed: [%d] %s", rc, ftdi_get_error_string(&ftdic));
+        goto open_err;
+    }
+
+    rc = ftdi_set_bitmode(&ftdic, 0, BITMODE_RESET);
+    if (rc < 0) {
+        SPI_ERR("FTDI: reset bitmode failed: [%d] %s", rc, ftdi_get_error_string(&ftdic));
+        goto open_err;
+    }
+
+    /* If pinout was not set via spi_set_pinout() */
+    if (!spi_pinout_set)
+        spi_set_pinout(SPI_PINOUT_HWSPI);
+
+    /* Set pins direction */
+    output_pins = spi_pins->mosi | spi_pins->clk | spi_pins->ncs;
+    if (spi_pins->nledr)
+        output_pins |= spi_pins->nledr;
+    if (spi_pins->nledw)
+        output_pins |= spi_pins->nledw;
+    rc = ftdi_set_bitmode(&ftdic, output_pins, BITMODE_SYNCBB);
+    if (rc < 0) {
+        SPI_ERR("FTDI: set synchronous bitbang mode failed: [%d] %s", rc, ftdi_get_error_string(&ftdic));
+        goto open_err;
+    }
 
     /* Initialize xfer buffers */
     ftdi_out_buf = malloc(ftdi_buf_size);
