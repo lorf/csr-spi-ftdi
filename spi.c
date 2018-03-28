@@ -63,9 +63,10 @@ static struct ftdi_device_ids ftdi_device_ids[] = {
     { 0x0403, 0x6010, "FT2232" }, /* FT2232H/C/D */
     { 0x0403, 0x6011, "FT4232" }, /* FT4232H */
     { 0x0403, 0x6014, "FT232H" }, /* FT232H */
-#ifdef ENABLE_FT230X
-    /* FT230X support is available since libftdi-1.1 */
-    { 0x0403, 0x6015, "FT230X" }, /* FT230X */
+#ifdef ENABLE_FT_X
+    /* FT-X family support is available since libftdi-1.1. This includes
+     * FT220X, FT221X, FT230X, FT231X, FT234XD and FT240X  */
+    { 0x0403, 0x6015, "FT-X FAMILY" }, /* FT-X family */
 #endif
 };
 
@@ -781,14 +782,15 @@ int spi_open(int nport)
             ftdi_type_str = "FT232H";
             ftdi_buf_size = 2048;
             break;
-#ifdef ENABLE_FT230X
-        /* FT230X support is available since libftdi-1.1 */
+#ifdef ENABLE_FT_X
         case TYPE_230X:
-            ftdi_type_str = "FT230X";
+            ftdi_type_str = "FT-X FAMILY";
             ftdi_buf_size = 1024;
-            /* If pinout was not set via spi_set_pinout() */
+            /* Change default pinout if pinout was not set via spi_set_pinout() */
+            /*
             if (!spi_pinout_set)
                 spi_set_pinout(SPI_PINOUT_HWSPI);
+            */
             break;
 #endif
         default:

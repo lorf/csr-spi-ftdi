@@ -123,13 +123,13 @@ KiCad schematic for a dedicated programmer can be found in
 
 The following FTDI chips are reported working with programmer driver: FT232R
 (including counterfeits, even "bricked" ones), FT2232H, FT4232H. There is
-experimental support for the following chips: FT2232C, FT2232D, FT232H, FT230X.
-Please report the working status via
+experimental support for the following chips: FT2232C, FT2232D, FT232H, FT220X,
+FT221X, FT230X, FT231X, FT234XD, FT240X. Please report the working status via
 [GitHub issues](https://github.com/lorf/csr-spi-ftdi/issues).
 
-FT230X has only four primary GPIO pins and does not support default pinout. The
-pinout for FT230X is set to `hwspi` on initialization, see `FTDI_PINOUT`
-[option](#options).
+Some FT-X family chips (FT220X, FT230X, FT234XD) have only four primary GPIO
+pins and don't support default pinout. To use such chip You'll need to set
+`hwspi` pinout using `FTDI_PINOUT` [option](#options).
 
 ### Counterfeit FT232RL chips
 
@@ -250,13 +250,13 @@ variables or using the -TRANS option to most CSR commandline apps.
   * `default` - default pinout as described in [Using FT232RL breakout board as
     a programmer](#using-ft232rl-breakout-board-as-a-programmer).
   * `noleds` - this is the same as `default` but without LEDs.
-  * `hwspi` - pinout for use with MPSSE chips (FT2232, FT4232, FT232H), uses
-    the same pins as hardware SPI. Note that hardware SPI capability is not
-    used, just the same pinout is used for convenience. This pinout can be used
-    with adapters like [TIAO
-    TUMPA](http://www.tiaowiki.com/w/TIAO_USB_Multi_Protocol_Adapter_User's_Manual).
-    The pinout is as follows: `CS` - `CTS#` (`D3`), `CLK` - `TXD` (`D0`), `MOSI` -
-    `RXD` (`D1`), `MISO` - `RTS#` (`D2`).
+  * `hwspi` - pinout for use with MPSSE (FT2232, FT4232, FT232H) and FT-X
+    chips, uses the same pins as hardware SPI. Note that hardware SPI
+    capability is not used, just the same pinout is used for convenience. This
+    pinout can be used with adapters like
+    [TIAO TUMPA](http://www.tiaowiki.com/w/TIAO_USB_Multi_Protocol_Adapter_User's_Manual).
+    The pinout is as follows: `CS` - `CTS#` (`D3`), `CLK` - `TXD` (`D0`),
+    `MOSI` - `RXD` (`D1`), `MISO` - `RTS#` (`D2`).
   * `hwspi+leds` - this is the same as `hwspi` but adds read and write LEDs on
     `DTR#` (`D4`) and `DSR#` (`D5`) pins respectively.
   * `sparkfun` - pinout for use with adapters with TX, RX, DTR and CTS
