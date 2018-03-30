@@ -47,7 +47,7 @@ static struct spi_stats {
 
 struct ftdi_device_ids {
     uint16_t vid, pid;
-    char name[10];
+    const char *name;
 };
 
 #define SPI_MAX_PORTS   16
