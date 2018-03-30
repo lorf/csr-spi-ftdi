@@ -122,10 +122,18 @@ KiCad schematic for a dedicated programmer can be found in
 ### Supported FTDI chips
 
 The following FTDI chips are reported working with programmer driver: FT232R
-(including counterfeits, even "bricked" ones), FT2232H, FT4232H. There is
-experimental support for the following chips: FT2232C, FT2232D, FT232H, FT220X,
-FT221X, FT230X, FT231X, FT234XD, FT240X. Please report the working status via
+(including counterfeits, even "bricked" ones), FT2232H, FT4232H, FT230X. There
+is experimental support for the following chips: FT2232C, FT2232D, FT232H,
+FT220X, FT221X, FT231X, FT234XD, FT240X. Please report the working status via
 [GitHub issues](https://github.com/lorf/csr-spi-ftdi/issues).
+
+Note that some earlier revisions of original FT232R (rev A, B, and maybe some
+batches of rev C) suffer from bitbang mode hardware bugs
+([1](http://blog.bitheap.net/2012/03/ft232r-bitbang-mode-is-broken.html),
+[2](https://stb-tester.com/blog/2016/05/26/ir-post-mortem)) that may affect
+programmer functionality. See issue
+[#10](https://github.com/lorf/csr-spi-ftdi/issues/10). Counterfeit FT232RL
+chips are not affected.
 
 Some FT-X family chips (FT220X, FT230X, FT234XD) have only four primary GPIO
 pins and don't support default pinout. To use such chip You'll need to set
@@ -164,9 +172,10 @@ procedures, but csr-spi-ftdi will work on the bricked chips too.
 ### CSR software
 
 This driver is tested with CSR BlueSuite 2.1 - 2.6.0 and with CSR BlueLab 4.1,
-but should work with other CSR software, such as SDK, ADK, Configuration Tool,
-Parameter Manager. Newer versions of BlueSuite can be found at
-`https://www.csrsupport.com/PCSW`. Older versions of BlueSuite can be found at
+but should work with other CSR software, such as SDK, ADK, Configuration Tool.
+The driver is known to not work with CSR Parameter Manager, see [Bugs](#bugs).
+Newer versions of BlueSuite can be found at `https://www.csrsupport.com/PCSW`.
+Older versions of BlueSuite can be found at
 `https://www.csrsupport.com/PCSWArchive`. Access to these pages requires
 registration.
 
@@ -196,8 +205,8 @@ environment variable, see wine(1) man page for details.
 Allow yourself access to FTDI device
 
     cat <<_EOT_ | sudo tee -a /etc/udev/rules.d/99-ftdi.rules
-    # FT232R
-    SUBSYSTEM=="usb", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", MODE="0660", GROUP="plugdev"
+    # All FTDI chips
+    SUBSYSTEM=="usb", ATTRS{idVendor}=="0403", MODE="0660", GROUP="plugdev"
     _EOT_
 
 After that You'll need to add yourself to `plugdev` group and relogin.
@@ -285,7 +294,9 @@ or this directory should be in your PATH.
 
         BlueFlashCmd.exe -chipver
 
-* Display chip ID, firmware version and flash size:
+* Display chip ID, firmware version and flash size. This also doubles as a
+  thorough communication test, it transfers a (quite large) chunk of code to
+  the chip, resets it and runs the code, talking to the flash chip:
 
         BlueFlashCmd.exe -identify
 
@@ -429,10 +440,14 @@ Build with command:
 
 * See [Issues on github](https://github.com/lorf/csr-spi-ftdi/issues) to list
   current bug reports or to report a bug.
-* Current implementation of 1.4 SPI API (used in BlueSuite starting from 2.4)
-  is based on a wild guess and is just a wrapper around 1.3 functions. It
-  doesn't support multiple programmers connected at the same time and may
-  contain other bugs.
+* Some long standing bugs on a
+  [TODO](https://github.com/lorf/csr-spi-ftdi/wiki/TODO) list:
+  * Multiple programmers connected at the same time are not supported. For this
+    to work, stream API (used by BlueSuite starting from 2.4) need to be
+    properly implemented. Currently `spifns_stream_*()` functions are just
+    wrappers around non-stream implementations.
+  * CSR Parameter Manager is known to not work with this driver.
+    `spifns_bccmd_*()` API needs to be implemented for it to work.
 
 
 ## Thanks
