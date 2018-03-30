@@ -164,9 +164,10 @@ procedures, but csr-spi-ftdi will work on the bricked chips too.
 ### CSR software
 
 This driver is tested with CSR BlueSuite 2.1 - 2.6.0 and with CSR BlueLab 4.1,
-but should work with other CSR software, such as SDK, ADK, Configuration Tool,
-Parameter Manager. Newer versions of BlueSuite can be found at
-`https://www.csrsupport.com/PCSW`. Older versions of BlueSuite can be found at
+but should work with other CSR software, such as SDK, ADK, Configuration Tool.
+The driver is known to not work with CSR Parameter Manager, see [Bugs](#bugs).
+Newer versions of BlueSuite can be found at `https://www.csrsupport.com/PCSW`.
+Older versions of BlueSuite can be found at
 `https://www.csrsupport.com/PCSWArchive`. Access to these pages requires
 registration.
 
@@ -196,8 +197,8 @@ environment variable, see wine(1) man page for details.
 Allow yourself access to FTDI device
 
     cat <<_EOT_ | sudo tee -a /etc/udev/rules.d/99-ftdi.rules
-    # FT232R
-    SUBSYSTEM=="usb", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", MODE="0660", GROUP="plugdev"
+    # All FTDI chips
+    SUBSYSTEM=="usb", ATTRS{idVendor}=="0403", MODE="0660", GROUP="plugdev"
     _EOT_
 
 After that You'll need to add yourself to `plugdev` group and relogin.
@@ -429,10 +430,14 @@ Build with command:
 
 * See [Issues on github](https://github.com/lorf/csr-spi-ftdi/issues) to list
   current bug reports or to report a bug.
-* Current implementation of 1.4 SPI API (used in BlueSuite starting from 2.4)
-  is based on a wild guess and is just a wrapper around 1.3 functions. It
-  doesn't support multiple programmers connected at the same time and may
-  contain other bugs.
+* Some long standing bugs on a
+  [TODO](https://github.com/lorf/csr-spi-ftdi/wiki/TODO) list:
+  * Multiple programmers connected at the same time are not supported. For this
+    to work, stream API (used by BlueSuite starting from 2.4) need to be
+    properly implemented. Currently `spifns_stream_*()` functions are just
+    wrappers around non-stream implementations.
+  * CSR Parameter Manager is known to not work with this driver.
+    `spifns_bccmd_*()` API needs to be implemented for it to work.
 
 
 ## Thanks
