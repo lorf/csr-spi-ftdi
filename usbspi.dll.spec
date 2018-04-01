@@ -1,4 +1,5 @@
-# This part is for API version 1.3
+@ cdecl spifns_bccmd_cmd(ptr long long)
+@ cdecl spifns_bccmd_init(long long)
 @ cdecl spifns_getvarlist(ptr ptr)
 @ cdecl spifns_init()
 @ cdecl spifns_getvar(ptr)
@@ -12,7 +13,9 @@
 @ cdecl spifns_sequence(ptr long)
 @ cdecl spifns_bluecore_xap_stopped()
 @ cdecl spifns_clear_last_error()
-# Below is a part for the API version 1.4
+# Below is a part for the stream API
+@ cdecl spifns_stream_bccmd_cmd(long ptr long long)
+@ cdecl spifns_stream_bccmd_init(long long long)
 @ cdecl spifns_count_streams()
 @ cdecl spifns_get_last_error32(ptr ptr)
 @ cdecl spifns_stream_bluecore_xap_stopped(long)

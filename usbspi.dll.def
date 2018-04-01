@@ -1,5 +1,7 @@
 LIBRARY "usbspi"
 EXPORTS
+	spifns_bccmd_cmd
+	spifns_bccmd_init
 	spifns_bluecore_xap_stopped
 	spifns_chip_select
 	spifns_close
@@ -15,6 +17,8 @@ EXPORTS
 	spifns_count_streams
 	spifns_clear_last_error
 	spifns_get_last_error32
+	spifns_stream_bccmd_cmd
+	spifns_stream_bccmd_init
 	spifns_stream_bluecore_xap_stopped
 	spifns_stream_chip_select
 	spifns_stream_close

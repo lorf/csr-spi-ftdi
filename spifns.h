@@ -171,11 +171,13 @@ DLLEXPORT const char* spifns_command(const char *szCmd); //Return 0 on no error,
 DLLEXPORT unsigned int spifns_get_last_error(unsigned short *pnErrorAddress, const char **szErrorString); //Returns where the error occured, or 0x100 for none
 DLLEXPORT int spifns_bluecore_xap_stopped(); //Returns -1 on error, 0 on XAP running, 1 on stopped
 DLLEXPORT int spifns_sequence(SPISEQ *pSequence, unsigned int nCount); //Return 0 on no error
+DLLEXPORT int spifns_bccmd_init(unsigned int _spi_user_cmd_addr, unsigned int _bccmd_spi_interface_addr);
+DLLEXPORT int spifns_bccmd_cmd(uint16_t *pdu, unsigned int _pdulen, unsigned int wait_for_result);
 DLLEXPORT void spifns_set_debug_callback(spifns_debug_callback pCallback);
 DLLEXPORT void spifns_clear_last_error(void);
 
 
-/* SPI API 1.4 */
+/* SPI API 1.4 structure */
 /* From BlueSuiteSource_V2_5.zip/CSRSource/result/include/spi/spifns.h */
 
 struct SPISEQ_1_4 {
@@ -217,6 +219,8 @@ DLLEXPORT const char* spifns_stream_command(spifns_stream_t stream, const char *
 DLLEXPORT const char* spifns_stream_getvar(spifns_stream_t stream, const char *var);
 DLLEXPORT void spifns_stream_chip_select(spifns_stream_t stream, int which);
 DLLEXPORT int spifns_stream_bluecore_xap_stopped(spifns_stream_t stream);
+DLLEXPORT int spifns_stream_bccmd_init(spifns_stream_t stream, unsigned int _spi_user_cmd_addr, unsigned int _bccmd_spi_interface_addr);
+DLLEXPORT int spifns_stream_bccmd_cmd(spifns_stream_t stream, uint16_t *pdu, unsigned int _pdulen, unsigned int wait_for_result);
 /* returns the last error code, and if a pointer is passed in, the problematic
  * address.*/
 /* get_last_error and clear_last_error both deal with the error that occurred

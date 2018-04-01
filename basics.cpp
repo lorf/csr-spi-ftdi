@@ -10,6 +10,7 @@
 #include "spi.h"
 #include "compat.h"
 #include "logging.h"
+#include "bccmd.h"
 
 /*
  * This is based on CsrSpiDrivers/spilpt.fixed, converted to our SPI impl and
@@ -50,6 +51,10 @@ char g_szErrorString[256]="No error";
 unsigned int g_nError=SPIERR_NO_ERROR;
 unsigned short g_nErrorAddress=0;
 static uint32_t spifns_api_version = 0;
+// SPI_USER_CMD register address
+uint16_t spi_user_cmd_addr = 0;
+// BCCMD_SPI_INTERFACE structure address
+uint16_t bccmd_spi_interface_addr = 0;
 
 /* We support only one stream currently - stream 0 */
 #define STREAM      ((spifns_stream_t)0)
@@ -556,6 +561,148 @@ DLLEXPORT int spifns_bluecore_xap_stopped() {
     return SPIFNS_XAP_STOPPED;
 }
 
+
+/*
+ * BCCMD SPI protocol implementation
+ *
+ * References:
+ *  * https://github.com/Frans-Willem/CsrUsbSpiDeviceRE/blob/master/csrspi.c
+ *  * BlueSuiteSource_V2_5.zip/CSRSource/interface/host/bccmd/bccmd_spi_common.h
+ *  * BlueSuiteSource_V2_5.zip/CSRSource/interface/host/bccmd/bccmdpdu.h
+ *  * BlueSuiteSource_V2_5.zip/CSRSource/devHost/engine/bccmd_trans/bccmd_spi.cpp
+ * More info:
+ *  * bcore-sp-002Pc - BCCMD protocol
+ *  * bcore-sp-005Pe - BCCMD commands
+ */
+
+DLLEXPORT int spifns_bccmd_init(unsigned int _spi_user_cmd_addr, unsigned int _bccmd_spi_interface_addr) {
+    LOG(DEBUG, "(0x%02x, 0x%02x)", _spi_user_cmd_addr, _bccmd_spi_interface_addr);
+    spi_user_cmd_addr = (uint16_t)_spi_user_cmd_addr;
+    bccmd_spi_interface_addr = (uint16_t)_bccmd_spi_interface_addr;
+    return 1;
+}
+
+#define LOG_PDU(_loc, _ipdu) do { \
+        BCCMDPDU *_bpdu = (BCCMDPDU *)_ipdu; \
+        const char *_type = (_bpdu->type == BCCMDPDU_GETREQ ? "GetReq(0)" : \
+            (_bpdu->type == BCCMDPDU_GETRESP ? "GetResp(1)" : \
+            (_bpdu->type == BCCMDPDU_SETREQ ? "SetReq(2)" : "Unknown"))); \
+        LOG(INFO, "%s PDU: type=%s, pdulen=%u, seqno=%u, varid=%u, status=%u", \
+            _loc, _type, _bpdu->pdulen, _bpdu->seqno, _bpdu->varid, \
+            _bpdu->status); \
+        DUMP(_bpdu->d.u8d, 2*(_bpdu->pdulen - BCCMDPDU_OVERHEAD_LEN), \
+            "%s PDU payload", _loc); \
+    } while (0)
+
+#define BCCMD_RETRIES 30
+
+// BlueSuiteSource_V2_5/CSRSource/devHost/engine/bccmd_trans/bccmd_spi.cpp:set_flag_wait()
+static uint16_t spifns_bccmd_spi_cmd_wait(uint16_t cmd) {
+    uint16_t tmp = 0, ret = 0;
+    int ii;
+
+    // Save the SPI_USER_CMD register value
+    if (spifns_sequence_read(spi_user_cmd_addr, 1, &tmp))
+        return cmd;
+
+    // Write command to the interface structure
+    if (spifns_sequence_write(bccmd_spi_interface_addr, 1, &cmd))
+        return cmd;
+
+    // Trigger the "BG interrupt" by writing old value to SPI_USER_CMD register
+    if (spifns_sequence_write(spi_user_cmd_addr, 1, &tmp))
+        return cmd;
+
+    // XXX 100 ms timeout
+    for (ii = 0; ii < BCCMD_RETRIES; ii++) {
+        // Read the command status
+        if (spifns_sequence_read(bccmd_spi_interface_addr, 1, &ret))
+            return cmd;
+
+        // Status of the interface changed
+        if (cmd != ret)
+            return ret;
+    }
+
+    // Timeout
+    return ret;
+}
+
+// https://github.com/Frans-Willem/CsrUsbSpiDeviceRE/blob/master/csrspi.c#L211
+// BlueSuiteSource_V2_5/CSRSource/devHost/engine/bccmd_trans/bccmd_spi.cpp:process_pdu()
+DLLEXPORT int spifns_bccmd_cmd(uint16_t *pdu, unsigned int _pdulen, unsigned int wait_for_result) {
+    uint16_t bufaddr = 0, ret = 0;
+    uint16_t pdulen = (uint16_t)_pdulen;
+
+    LOG(DEBUG, "(%p, %d, %d)", pdu, _pdulen, wait_for_result);
+    LOG_PDU("Request", pdu);
+
+    // See comment to the BCCMD_SPI_INTERFACE structure definition in bccmd.h
+    // for the logic description.
+
+    // Get the status of the current operation
+    if (spifns_sequence_read(bccmd_spi_interface_addr, 1, &ret))
+        return 0;
+
+    // Reset to a known state if there was unfinished operation previously
+    if (ret != BCCMD_SPI_CMD_IDLE && ret != BCCMD_SPI_CMD_ALLOC_FAIL) {
+        ret = spifns_bccmd_spi_cmd_wait(BCCMD_SPI_CMD_DONE);
+        // Chip state machine must be in IDLE or ALLOC_FAIL to begin a command,
+        // or it just won't work.
+        if (ret != BCCMD_SPI_CMD_IDLE && ret != BCCMD_SPI_CMD_ALLOC_FAIL) {
+            LOG(ERR, "BCCmd: freing chip buffer failed, status: %d", ret);
+            return 0;
+        }
+    }
+
+    // Allocate PDU buffer of the a given length on a chip
+    spifns_sequence_write(bccmd_spi_interface_addr + 1, 1, &pdulen);
+    ret = spifns_bccmd_spi_cmd_wait(BCCMD_SPI_CMD_ALLOC_REQ);
+    if (ret == BCCMD_SPI_CMD_ALLOC_FAIL) {
+        LOG(ERR, "BCCmd: chip buffer allocation failed, status: %d", ret);
+        return 0;
+    }
+    if (ret != BCCMD_SPI_CMD_ALLOC_OK) {
+        LOG(ERR, "BCCmd: chip didn't responded properly to memory allocation request, status: %d", ret);
+        return 0;
+    }
+
+    // Read the allocated buffer address
+    if (spifns_sequence_read(bccmd_spi_interface_addr + 2, 1, &bufaddr))
+        return 0;
+
+    // Write the PDU to the buffer
+    if (spifns_sequence_write(bufaddr, pdulen, pdu))
+        return 0;
+
+    // Execute BCCmd, the status should change to PENDING on return
+    ret = spifns_bccmd_spi_cmd_wait(BCCMD_SPI_CMD_CMD);
+    // Wait for BCCmd to finish
+    // XXX 1s timeout
+    while (ret == BCCMD_SPI_CMD_PENDING) {
+        if (spifns_sequence_read(bccmd_spi_interface_addr, 1, &ret))
+            return 0;
+    }
+    if (ret != BCCMD_SPI_CMD_RESP) {
+        LOG(ERR, "BCCmd: execution failed, status: %d", ret);
+        return 0;
+    }
+
+    // Read the response PDU from the buffer
+    if (spifns_sequence_read(bufaddr, pdulen, pdu))
+        return 0;
+
+    // Free PDU buffer on a chip
+    ret = spifns_bccmd_spi_cmd_wait(BCCMD_SPI_CMD_DONE);
+    if (ret != BCCMD_SPI_CMD_IDLE) {
+        LOG(ERR, "BCCmd: freing chip buffer failed, status: %d", ret);
+        return 0;
+    }
+
+    LOG_PDU("Response", pdu);
+    return 1;
+}
+
 /* This is a limited implementation of CSR SPI API 1.4. It supports only 1
  * stream and does not support all of the features. */
 
@@ -639,6 +786,16 @@ DLLEXPORT int spifns_stream_bluecore_xap_stopped(spifns_stream_t stream)
 {
     LOG(DEBUG, "(%d)", stream);
     return spifns_bluecore_xap_stopped();
+}
+
+DLLEXPORT int spifns_stream_bccmd_init(spifns_stream_t stream, unsigned int _spi_user_cmd_addr, unsigned int _bccmd_spi_interface_addr) {
+    LOG(DEBUG, "(%d, %d, %d)", stream, _spi_user_cmd_addr, _bccmd_spi_interface_addr);
+    return spifns_bccmd_init(_spi_user_cmd_addr, _bccmd_spi_interface_addr);
+}
+
+DLLEXPORT int spifns_stream_bccmd_cmd(spifns_stream_t stream, uint16_t *pdu, unsigned int _pdulen, unsigned int wait_for_result) {
+    LOG(DEBUG, "(%d, %p, %d, %d)", stream, pdu, _pdulen, wait_for_result);
+    return spifns_bccmd_cmd(pdu, _pdulen, wait_for_result);
 }
 
 /* returns the last error code, and if a pointer is passed in, the problematic

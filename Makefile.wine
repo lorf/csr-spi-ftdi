@@ -59,7 +59,7 @@ $(OBJDIR)/$(LIBNAME): $(OBJDIR)/dllmain.o $(OBJDIR)/basics.o $(OBJDIR)/spi.o $(O
 install:
 	install -m 0644 -o root -g root $(OBJDIR)/$(LIBNAME) $(WINE_LIB)/$(LIBNAME)
 
-$(OBJDIR)/basics.o: spi.h spifns.h logging.h dllmain.h compat.h
+$(OBJDIR)/basics.o: spi.h spifns.h logging.h dllmain.h compat.h bccmd.h
 $(OBJDIR)/spi.o: spi.h compat.h logging.h
 $(OBJDIR)/logging.o: logging.h compat.h
 
