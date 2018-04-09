@@ -28,7 +28,7 @@ CXX =	$(TOOLCHAIN)g++
 CC =	$(TOOLCHAIN)gcc
 LD =	$(TOOLCHAIN)gcc
 
-VERSION := $(shell cat VERSION)
+VERSION := $(shell git describe --tags)
 GIT_REVISION := $(shell git log -1 --format=%h 2>/dev/null)
 CPPFLAGS +=	-DVERSION=\"$(VERSION)\" -DGIT_REVISION=\"$(GIT_REVISION)\"
 

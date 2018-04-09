@@ -21,7 +21,7 @@ CPPFLAGS += $(shell libftdi1-config --cflags) $(shell env PKG_CONFIG_PATH=$(I386
 LDFLAGS += -s
 
 WINEGCC_VER := $(shell env LC_ALL=C winegcc -v 2>&1 | awk '/^gcc version/ {print $$3}' | cut -d. -f1,2)
-VERSION := $(shell cat VERSION)
+VERSION := $(shell git describe --tags)
 GIT_REVISION := $(shell git log -1 --format=%h 2>/dev/null)
 CPPFLAGS +=	-DVERSION=\"$(VERSION)\" -DGIT_REVISION=\"$(GIT_REVISION)\"
 

@@ -1,4 +1,4 @@
-VERSION :=	$(shell cat VERSION)
+VERSION :=	$(shell git describe --tags)
 ZIP_NAME ?=	csr-spi-ftdi-$(VERSION)
 ZIP_FILES +=	lib-win32 lib-wine-linux README.md hardware misc utils
 
