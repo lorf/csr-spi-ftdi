@@ -127,11 +127,12 @@ is experimental support for the following chips: FT2232C, FT2232D, FT232H,
 FT220X, FT221X, FT231X, FT234XD, FT240X. Please report the working status via
 [GitHub issues](https://github.com/lorf/csr-spi-ftdi/issues).
 
-Note that some earlier revisions of original FT232R (rev A, B, and maybe some
-batches of rev C) suffer from bitbang mode hardware bugs
-([1](http://blog.bitheap.net/2012/03/ft232r-bitbang-mode-is-broken.html),
-[2](https://stb-tester.com/blog/2016/05/26/ir-post-mortem)) that may affect
-programmer functionality. See issue
+Note that revisions A, B and (may be some batches of) C of original FT232R suffer from
+[bitbang mode hardware bug](http://blog.bitheap.net/2012/03/ft232r-bitbang-mode-is-broken.html)
+that may affect programmer functionality. It seems that the bug was partially fixed in
+revision C, and although the fix
+[is not perfect](https://stb-tester.com/blog/2016/05/26/ir-post-mortem),
+my rev C chip works fine with csr-spi-ftdi. See issue
 [#10](https://github.com/lorf/csr-spi-ftdi/issues/10). Counterfeit FT232RL
 chips are not affected.
 
