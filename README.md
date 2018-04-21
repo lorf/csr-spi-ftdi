@@ -223,7 +223,8 @@ After that You'll need to add yourself to `plugdev` group and relogin.
 5. Download and run Zadig from <http://zadig.akeo.ie/>. In Options menu choose
    "List all devices", choose Your FTDI device ("FT232R USB UART" or similar),
    choose libusbK driver, press "Replace driver" or "Install driver".  This
-   will install generic libusb-compatible driver for your FTDI chip. There is a
+   will install generic libusb-compatible driver for your FTDI chip. Zadig
+   manual is here: <https://github.com/pbatard/libwdi/wiki/Zadig>. There is a
    tutorial on running libftdi programs on Windows here:
    <http://embedded-funk.net/running-libftdi-under-windows/>;
 6. Run your CSR apps.

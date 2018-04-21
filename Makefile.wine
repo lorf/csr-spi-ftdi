@@ -1,8 +1,8 @@
 TARGET_PLATFORM ?= linux
 
-WINE_LIB ?=	/usr/lib/i386-linux-gnu/wine
+#WINE_LIB ?=	/usr/lib/i386-linux-gnu/wine
 # Uncomment for wine-devel:
-#WINE_LIB = /opt/wine-devel/lib/wine /opt/wine-devel/lib
+WINE_LIB = /opt/wine-devel/lib/wine /opt/wine-devel/lib
 I386_LIB ?=	/usr/lib/i386-linux-gnu
 STDCXX_LIB ?=	/usr/lib/gcc/i686-linux-gnu/$(WINEGCC_VER)
 
