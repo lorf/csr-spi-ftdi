@@ -3,8 +3,10 @@
 # Use mingw-w64
 TOOLCHAIN ?= i686-w64-mingw32-
 
-LIBFTDI ?=	./libftdi1
-LIBUSB ?=	./libusb
+LIBFTDI1_INCLUDE ?=	./libftdi1-win32/include/libftdi1
+LIBFTDI1_LIB ?=	./libftdi1-win32/lib
+LIBUSB_INCLUDE ?=	./libusb-win32/include
+LIBUSB_LIB ?=	./libusb-win32/MinGW32/static
 
 # Print scr-spi-ftdi statistics before exit
 CPPFLAGS +=	-DSPI_STATS
@@ -36,12 +38,12 @@ CFLAGS +=	-m32 -Wall
 CXXFLAGS += -fno-exceptions
 LDFLAGS +=	-shared -m32 -O2 -static
 
-CPPFLAGS +=	-I$(LIBFTDI)/include/libftdi1
-LDFLAGS  += -L$(LIBFTDI)/lib
+CPPFLAGS +=	-I$(LIBFTDI1_INCLUDE)
+LDFLAGS  += -L$(LIBFTDI1_LIB)
 LDLIBS   += -lftdi1
 
-CPPFLAGS +=	-I$(LIBUSB)/include
-LDFLAGS  += -L$(LIBUSB)/MinGW32/static
+CPPFLAGS +=	-I$(LIBUSB_INCLUDE)
+LDFLAGS  += -L$(LIBUSB_LIB)
 LDLIBS   += -lusb-1.0
 
 MAKEFILE =	$(firstword $(MAKEFILE_LIST))

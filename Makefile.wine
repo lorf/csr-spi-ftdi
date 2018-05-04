@@ -1,10 +1,12 @@
 TARGET_PLATFORM ?= linux
 
-#WINE_LIB ?=	/usr/lib/i386-linux-gnu/wine
+WINE_LIB ?=	/usr/lib/i386-linux-gnu/wine
 # Uncomment for wine-devel:
-WINE_LIB = /opt/wine-devel/lib/wine /opt/wine-devel/lib
+#WINE_LIB = /opt/wine-devel/lib/wine /opt/wine-devel/lib
 I386_LIB ?=	/usr/lib/i386-linux-gnu
 STDCXX_LIB ?=	/usr/lib/gcc/i686-linux-gnu/$(WINEGCC_VER)
+LIBFTDI1_LIB ?= ./libftdi1-linux/lib
+LIBFTDI1_INCLUDE ?= ./libftdi1-linux/include/libftdi1
 
 # Print scr-spi-ftdi statistics before exit
 CPPFLAGS +=	-DSPI_STATS
@@ -12,7 +14,7 @@ CPPFLAGS +=	-DSPI_STATS
 CPPFLAGS += -DENABLE_LEDS
 # Support for FT-X family chips is available since libftdi-1.1
 CPPFLAGS += -DENABLE_FT_X
-CPPFLAGS += $(shell libftdi1-config --cflags) $(shell env PKG_CONFIG_PATH=$(I386_LIB)/pkgconfig pkg-config --cflags libusb-1.0)
+CPPFLAGS += -I$(LIBFTDI1_INCLUDE) $(shell env PKG_CONFIG_PATH=$(I386_LIB)/pkgconfig pkg-config --cflags libusb-1.0)
 
 # Compile with debugging
 #CFLAGS += -g -fno-inline
@@ -36,7 +38,7 @@ LDFLAGS +=	-shared -m32 -static-libgcc
 LDFLAGS +=	$(addprefix -L,$(WINE_LIB) $(I386_LIB) $(STDCXX_LIB))
 #LDLIBS=	-lftdi -lusb-1.0
 # Build with static versions of libraries
-LDLIBS +=	$(I386_LIB)/libftdi1.a $(I386_LIB)/libusb-1.0.a -ludev -lpthread
+LDLIBS +=	$(LIBFTDI1_LIB)/libftdi1.a $(I386_LIB)/libusb-1.0.a -ludev -lpthread
 
 MAKEFILE =	$(firstword $(MAKEFILE_LIST))
 
