@@ -49,7 +49,7 @@ Programmer was tested with the following chips:
 * BC417143 (on HC-05 module)
 * BC57F687A
 * CSR8645
-* BC212015 (reported by Alex Nuc, see [Chip notes](#chip-notes))
+* BC212015 (reported by Alex Nuc, needs special handling, see below)
 
 ### Chip notes
 
@@ -69,6 +69,14 @@ Programmer was tested with the following chips:
   above. It's also reported that to flash/dump these chips it's required to
   lower SPI speed. So for BC2 chips it's recommended to use BlueSuite 2.3 and
   set `SPIMAXCLOCK=200` [option](#options).
+* There are circulating HC-05/HC-06 modules with "counterfeit" CSR chip, which
+  beleived to be BlueCore 3 MultiMedia External chip repackaged and relabeled
+  as BlueCore 4. Note that these modules are not code-compatible with old good
+  HC-05/HC-06 modules containing original BC4 chip. You can identify which
+  module You have by looking at the crystal oscillator frequency -
+  "counterfeit" BC3 module uses 16 MHz crystal, while original BC4 one has
+  26MHz crystal. For photos and detailed info see issue
+  [#25](https://github.com/lorf/csr-spi-ftdi/issues/25).
 
 ## Programmer hardware
 
@@ -366,7 +374,7 @@ or this directory should be in your PATH.
 
 Install build tools:
 
-    sudo apt-get install -y build-essential
+    sudo apt-get install -y build-essential pkg-config
 
 Install development libraries:
 
@@ -381,7 +389,7 @@ Build with command:
 
 Install build tools:
 
-    sudo apt-get install -y build-essential gcc-multilib g++-multilib
+    sudo apt-get install -y build-essential pkg-config gcc-multilib g++-multilib
 
 Install 32 bit stuff:
 
