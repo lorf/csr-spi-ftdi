@@ -32,6 +32,8 @@
 
 # CSR BlueCore USB SPI programmer/debugger
 
+[![Build Status](https://travis-ci.com/lorf/csr-spi-ftdi.svg?branch=master)](https://travis-ci.com/lorf/csr-spi-ftdi)
+
 This is USB SPI programmer and debugger for CSR BlueCore bluetooth chips, based
 on FTDI FT232R USB to UART converter chip. Programmer hardware can be made
 using simple FT232RL breakout board, or built as a dedicated programmer using

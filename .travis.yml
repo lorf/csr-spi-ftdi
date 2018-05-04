@@ -6,20 +6,16 @@ env:
   global:
   - BUILD_IMAGE=lorf/csr-spi-ftdi-build:ubuntu-16.04-i386
 
+cache:
+  directories:
+  - dlcache
+
 services:
 - docker
 
-branches:
-  only:
-  - master
-  - devel
-  - /^issue-/
-  - /^\d+\.[\d\.]+(-.*)?$/
-  - /^travis-.*$/
-
 script:
-- docker run -v "$TRAVIS_BUILD_DIR":/build -i "$BUILD_IMAGE" ./build-in-docker.sh
- 
+- docker run --rm -v "$HOME:$HOME" -u `id -u`:`id -g` -w "$TRAVIS_BUILD_DIR" -i "$BUILD_IMAGE" ./build-in-docker.sh
+
 deploy:
 - provider: releases
   prerelease: false
@@ -30,7 +26,8 @@ deploy:
   file: csr-spi-ftdi-*.zip
   overwrite: true
   on:
-    branch: master
+    tags: true
+    condition: $TRAVIS_BRANCH =~ /^\d+\.[\d\.]+$/
 - provider: releases
   prerelease: true
   skip_cleanup: true
@@ -40,8 +37,8 @@ deploy:
   file: csr-spi-ftdi-*.zip
   overwrite: true
   on:
-    all_branches: true
-    condition: $TRAVIS_BRANCH != master
+    tags: true
+    condition: '! $TRAVIS_BRANCH =~ /^\d+\.[\d\.]+$/'
 
 notifications:
   email:
