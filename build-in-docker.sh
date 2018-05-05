@@ -1,10 +1,15 @@
 #!/bin/sh
+#
+# Intended to be run inside the build Docker container, see
+# <https://github.com/lorf/csr-spi-ftdi-build-image>. Can also be used
+# directly, provided all the build dependencies are installed.
+#
 
 set -xe
 
 LIBUSB_VERSION="1.0.22"
 LIBFTDI1_VERSION="1.4"
-LIBFTDI1_CMAKE_OPTS="-DBUILD_TESTS=OFF -DDOCUMENTATION=OFF -DEXAMPLES=OFF -DFTDI_EEPROM=OFF -DEXAMPLES=OFF -DPYTHON_BINDINGS=OFF -DLINK_PYTHON_LIBRARY=OFF"
+LIBFTDI1_CMAKE_OPTS="-DBUILD_TESTS=OFF -DDOCUMENTATION=OFF -DFTDI_EEPROM=OFF -DEXAMPLES=OFF -DPYTHON_BINDINGS=OFF -DLINK_PYTHON_LIBRARY=OFF"
 LIBFTDI1_CMAKE_FLAGS_LINUX="-DCMAKE_C_COMPILER=gcc -DCMAKE_CXX_COMPILER=g++ -DCMAKE_C_FLAGS=-m32 -DCMAKE_CXX_FLAGS=-m32"
 
 if ! [ -f "dlcache/libusb-$LIBUSB_VERSION.7z" ]; then
@@ -35,6 +40,8 @@ tar xjvf "dlcache/libftdi1-$LIBFTDI1_VERSION.tar.bz2"
 cd "libftdi1-$LIBFTDI1_VERSION"
 cmake $LIBFTDI1_CMAKE_FLAGS_LINUX $LIBFTDI1_CMAKE_OPTS \
     -DCMAKE_INSTALL_PREFIX=../libftdi1-linux .
+# Restart the configuration, see
+# https://gitlab.kitware.com/cmake/cmake/issues/17616
 rm -f CMakeCache.txt
 cmake $LIBFTDI1_CMAKE_FLAGS_LINUX $LIBFTDI1_CMAKE_OPTS \
     -DCMAKE_INSTALL_PREFIX=../libftdi1-linux .
