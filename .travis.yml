@@ -9,34 +9,12 @@ env:
 cache:
   directories:
   - dlcache
-  - $HOME/docker-cache
 
 services:
 - docker
 
-before_install:
-- |
-  if [ -f "$HOME/docker-cache/build-image.tar.gz" ]; then
-    echo "Restoring Docker image cache:"
-    du -h "$HOME/docker-cache"
-    zcat "$HOME/docker-cache/build-image.tar.gz" | docker load
-  fi
-- docker pull "$BUILD_IMAGE"
-
 script:
 - docker run --rm -v "$HOME:$HOME" -u `id -u`:`id -g` -w "$TRAVIS_BUILD_DIR" -i "$BUILD_IMAGE" ./build-in-docker.sh
-
-before_cache:
-- |
-  mkdir -p "$HOME/docker-cache"
-  id1=`docker images --format '{{.ID}}' "$BUILD_IMAGE"`
-  id2=`cat "$HOME/docker-cache/build-image.id" 2>/dev/null`
-  if [ "$id1" != "$id2" ]; then
-    docker save "$BUILD_IMAGE" | gzip > "$HOME/docker-cache/build-image.tar.gz"
-    echo "$id1" > "$HOME/docker-cache/build-image.id"
-  fi
-  echo "Docker image cache:"
-  du -h "$HOME/docker-cache"
 
 deploy:
 - provider: releases
