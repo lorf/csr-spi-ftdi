@@ -212,10 +212,10 @@ Allow yourself access to FTDI device
 
     cat <<_EOT_ | sudo tee -a /etc/udev/rules.d/99-ftdi.rules
     # All FTDI chips
-    SUBSYSTEM=="usb", ATTRS{idVendor}=="0403", MODE="0660", GROUP="plugdev"
+    SUBSYSTEM=="usb", ATTRS{idVendor}=="0403", MODE="0660", GROUP="plugdev", TAG+="uaccess"
     _EOT_
 
-After that You'll need to add yourself to `plugdev` group and relogin.
+After that You may need to add yourself to `plugdev` group and relogin.
 
 
 #### Installing on Windows
