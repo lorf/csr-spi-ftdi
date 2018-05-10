@@ -51,4 +51,4 @@ rm -rf "libftdi1-$LIBFTDI1_VERSION"
 
 make zip
 
-ls -l csr-spi-ftdi-*.zip
+ls -l release/csr-spi-ftdi-*.zip

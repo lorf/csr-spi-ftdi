@@ -23,7 +23,7 @@ deploy:
   api_key:
     secure: "MRpDrRDqUPntBZpyGwzp8A9GCz9UNSNsyMFQe4HfrOScOjNLcvJ2D+V+fGauGihI6j+0myHpdSJuxblrCrTT1M/gzR3lkX9i5JJYI2QoB7lwYHYk6ILXUFWPXAbo/jKLfKALMGUoBr7JY0fPeq5c2wlk3fp7AvL1Alzi0DHLS0hXdduBgt30dl68BiVTz0sBD/QHrsol8xK3dIW4eyfJWLfCldNk0Xx/BzCW0adg9ND2Gk0+fjmfjy3SLk4l7P3vRJNFruuCNxkpCP41F+IG/+PXcL++8cvaLUORRxAyZBh40kU2yh6k/v3zyLVYnHbEPMfWaJtIl5mX01fnqz9acgW0pDRvZLBupgg1TcMEqRaPH2A2wIOpxFAZ9xJNkT2lVAoPBKXCpgocHyAW5ROSlARf5hfY3xhruhYmgoqGHEk+qmtAMBnq2CIvW6JQPDnKgy2BJq6vfCN38+1JxHZUc+Ax1yqJ4m3HsaOc0sjAXNc53kfb/0UMOrRi2UiuO3ZO5vKhjyjUMC2kqbewD4iAMr+yuf+tMHJWU2dYQUqvjxTnIoSSwqfz3Bs0WFPAXAFmdm61oVfZ3ZoA2e5/UiIkWfix6j5hOf5RziwIJnQfUYW9qsyv7dXvEKGxr6atS/ykWKwK1XastX9uMhEw82aCP0lVL+AQmu0xTSByTVSdbMI="
   file_glob: true
-  file: csr-spi-ftdi-*.zip
+  file: release/csr-spi-ftdi-*.zip
   overwrite: true
   on:
     tags: true
@@ -34,7 +34,7 @@ deploy:
   api_key:
     secure: "MRpDrRDqUPntBZpyGwzp8A9GCz9UNSNsyMFQe4HfrOScOjNLcvJ2D+V+fGauGihI6j+0myHpdSJuxblrCrTT1M/gzR3lkX9i5JJYI2QoB7lwYHYk6ILXUFWPXAbo/jKLfKALMGUoBr7JY0fPeq5c2wlk3fp7AvL1Alzi0DHLS0hXdduBgt30dl68BiVTz0sBD/QHrsol8xK3dIW4eyfJWLfCldNk0Xx/BzCW0adg9ND2Gk0+fjmfjy3SLk4l7P3vRJNFruuCNxkpCP41F+IG/+PXcL++8cvaLUORRxAyZBh40kU2yh6k/v3zyLVYnHbEPMfWaJtIl5mX01fnqz9acgW0pDRvZLBupgg1TcMEqRaPH2A2wIOpxFAZ9xJNkT2lVAoPBKXCpgocHyAW5ROSlARf5hfY3xhruhYmgoqGHEk+qmtAMBnq2CIvW6JQPDnKgy2BJq6vfCN38+1JxHZUc+Ax1yqJ4m3HsaOc0sjAXNc53kfb/0UMOrRi2UiuO3ZO5vKhjyjUMC2kqbewD4iAMr+yuf+tMHJWU2dYQUqvjxTnIoSSwqfz3Bs0WFPAXAFmdm61oVfZ3ZoA2e5/UiIkWfix6j5hOf5RziwIJnQfUYW9qsyv7dXvEKGxr6atS/ykWKwK1XastX9uMhEw82aCP0lVL+AQmu0xTSByTVSdbMI="
   file_glob: true
-  file: csr-spi-ftdi-*.zip
+  file: release/csr-spi-ftdi-*.zip
   overwrite: true
   on:
     tags: true

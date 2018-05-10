@@ -374,7 +374,7 @@ To build simply run
 
     ./build.sh
 
-and You'll get `csr-spi-ftdi-<version>.zip` in the current directory. See
+and You'll get `csr-spi-ftdi-<version>.zip` in the `release` subdirectory. See
 [Installing prebuilt drivers](#installing-prebuilt-drivers) for installation
 instructions.
 
