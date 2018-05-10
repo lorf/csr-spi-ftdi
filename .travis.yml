@@ -8,7 +8,7 @@ env:
 
 cache:
   directories:
-  - dlcache
+  - cache
 
 services:
 - docker
