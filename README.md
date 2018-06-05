@@ -27,14 +27,14 @@
 
 # CSR BlueCore USB SPI programmer/debugger
 
-[![Build Status](https://travis-ci.com/lorf/csr-spi-ftdi.svg?branch=master)](https://travis-ci.com/lorf/csr-spi-ftdi)
+[![Download Release](https://img.shields.io/github/release/lorf/csr-spi-ftdi.svg?logo=github&label=download)](https://github.com/lorf/csr-spi-ftdi/releases/latest)
 
 This is USB SPI programmer and debugger for CSR BlueCore bluetooth chips, based
 on FTDI FT232R USB to UART converter chip. Programmer hardware can be made
 using simple FT232RL breakout board, or built as a dedicated programmer using
-included schematic. Programmer driver works by replacing USB SPI programmer
-driver, usbspi.dll, in CSR applications and is currently ported to Linux/Wine
-and Windows.
+included schematic. Some other FTDI chips are also supported. Programmer driver
+works by replacing USB SPI programmer driver, usbspi.dll, in CSR applications
+and is currently ported to Linux/Wine and Windows.
 
 Project home page: <https://github.com/lorf/csr-spi-ftdi>.
 
@@ -367,10 +367,10 @@ or this directory should be in your PATH.
 
 ### Building
 
-These instructions are for building in a Docker container using image with all
-dependencies installed. To setup Docker see <https://docs.docker.com/install/>.
+These instructions are for building on Linux in Docker container using provided
+Docker image with all dependencies installed.
 
-To build simply run
+To setup Docker see <https://docs.docker.com/install/>. To build simply run
 
     ./build.sh
 
@@ -378,8 +378,8 @@ and You'll get `csr-spi-ftdi-<version>.zip` in the `release` subdirectory. See
 [Installing prebuilt drivers](#installing-prebuilt-drivers) for installation
 instructions.
 
-Other build instructions are in [misc/building.md](misc/building.md), but
-they may be outdated.
+Build instructions for other build environments are in
+[misc/building.md](misc/building.md), but they may be outdated.
 
 ### Bugs
 
@@ -398,7 +398,7 @@ they may be outdated.
 ## Thanks
 * This project is a derivative of Frans-Willem Hardijzer's [reverse-engineered
   spilpt.dll drivers](https://github.com/Frans-Willem/CsrSpiDrivers);
-* Thanks to **unicorn** from <http://www.nebo-forum.kiev.ua/> for the idea of a
+* Thanks to [unicorn](https://github.com/uunicorn) from <http://www.nebo-forum.kiev.ua/> for the idea of a
   DLL for Wine.
 * Thanks to all the [Contributors](https://github.com/lorf/csr-spi-ftdi/wiki/Contributors)!
 
@@ -411,7 +411,7 @@ they may be outdated.
   Hardijzer, for Windows;
 * [USBSPI programmer](http://jernej87.blogspot.com/) based on CSR BC3 chip
   using original firmware by Jernej Škrabec;
-* [USBSPI programmer software for Linux](https://gitorious.org/csrprogrammer)
+* [USBSPI programmer software for Linux](https://gitorious.org/csrprogrammer/csrprogrammer)
   ([git mirror](https://github.com/lorf/csrprogrammer)) by Jernej Škrabec;
    * [USBSPI protocol
      analysis](http://jernej87.blogspot.com/2012/10/csrs-usb-programmer-protocol-analysis.html);
