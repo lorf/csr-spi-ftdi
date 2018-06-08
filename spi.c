@@ -941,6 +941,8 @@ void spi_output_stats(void)
     if (spi_stats.ftdi_xfers)
         avg_ftdi_xfer = spi_stats.ftdi_bytes / spi_stats.ftdi_xfers;
 
+    /* Casting time_t type variables to long int is to silence the winegcc
+     * warnings, because Wine MSVCRT still has 32 bit time_t. */
     fprintf(fp,
             "*** FTDI Statistics ********************************************************\n"
             "csr-spi-ftdi version: " VERSION " (git rev " GIT_REVISION ")\n"
@@ -958,18 +960,18 @@ void spi_output_stats(void)
             "SPI max clock: %lu kHz, min clock: %lu kHz, slowdowns: %lu\n"
             "****************************************************************************\n",
             fv.version_str, fv.snapshot_str,
-            spi_stats.tv_open.tv_sec, spi_stats.tv_open.tv_usec / 10000,
-            spi_stats.tv_xfer.tv_sec, spi_stats.tv_xfer.tv_usec / 10000, xfer_pct,
+            (long)spi_stats.tv_open.tv_sec, (long)spi_stats.tv_open.tv_usec / 10000,
+            (long)spi_stats.tv_xfer.tv_sec, (long)spi_stats.tv_xfer.tv_usec / 10000, xfer_pct,
             spi_stats.reads, spi_stats.read_bytes, avg_read,
             spi_stats.writes, spi_stats.write_bytes, avg_write,
             rate, spi_stats.read_bytes + spi_stats.write_bytes,
-                spi_stats.tv_xfer.tv_sec, spi_stats.tv_xfer.tv_usec / 10000,
+                (long)spi_stats.tv_xfer.tv_sec, (long)spi_stats.tv_xfer.tv_usec / 10000,
             iops, spi_stats.reads + spi_stats.writes,
-                spi_stats.tv_xfer.tv_sec, spi_stats.tv_xfer.tv_usec / 10000,
+                (long)spi_stats.tv_xfer.tv_sec, (long)spi_stats.tv_xfer.tv_usec / 10000,
             ftdi_type_str, ftdic.type, ftdi_buf_size,
             ftdi_rate, ftdi_short_rate, spi_stats.ftdi_xfers,
-                spi_stats.ftdi_short_reads, spi_stats.tv_xfer.tv_sec,
-                spi_stats.tv_xfer.tv_usec / 10000, ftdi_xfers_per_io, avg_ftdi_xfer,
+                spi_stats.ftdi_short_reads, (long)spi_stats.tv_xfer.tv_sec,
+                (long)spi_stats.tv_xfer.tv_usec / 10000, ftdi_xfers_per_io, avg_ftdi_xfer,
             spi_stats.spi_clock_max, spi_stats.spi_clock_min, spi_stats.slowdowns
     );
 }
