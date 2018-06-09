@@ -1,5 +1,6 @@
 #include <ftdi.h>
 #include <stdint.h>
+#include <inttypes.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <assert.h>
@@ -941,37 +942,37 @@ void spi_output_stats(void)
     if (spi_stats.ftdi_xfers)
         avg_ftdi_xfer = spi_stats.ftdi_bytes / spi_stats.ftdi_xfers;
 
-    /* Casting time_t type variables to long int is to silence the winegcc
-     * warnings, because Wine MSVCRT still has 32 bit time_t. */
+    /* Casting time_t type variables to int64_t because Wine MSVCRT still has
+     * 32 bit time_t, unlike newer versions of MinGW. */
     fprintf(fp,
             "*** FTDI Statistics ********************************************************\n"
             "csr-spi-ftdi version: " VERSION " (git rev " GIT_REVISION ")\n"
             "libftdi version: %s-%s\n"
-            "Time open: %ld.%02ld s\n"
-            "Time in xfer: %ld.%02ld s (%.2f%% of open time)\n"
+            "Time open: %" PRId64 ".%02" PRId64 " s\n"
+            "Time in xfer: %" PRId64 ".%02" PRId64 " s (%.2f%% of open time)\n"
             "Reads: %ld (%ld bytes, %.2f bytes avg read size)\n"
             "Writes: %ld (%ld bytes, %.2f bytes avg write size)\n"
-            "Xfer data rate: %.2f KB/s (%ld bytes in %ld.%02ld s)\n"
-            "IOPS: %.2f IO/s (%ld IOs in %ld.%02ld s)\n"
+            "Xfer data rate: %.2f KB/s (%ld bytes in %" PRId64 ".%02" PRId64 " s)\n"
+            "IOPS: %.2f IO/s (%ld IOs in %" PRId64 ".%02" PRId64 " s)\n"
             "FTDI chip: %s (%d), buffer size: %u bytes\n"
             "FTDI stats: %.2f xfers/s (%.2f short reads/s,\n"
-            "            %ld xfers/%ld short reads in %ld.%02ld s,\n"
+            "            %ld xfers/%ld short reads in %" PRId64 ".%02" PRId64 " s,\n"
             "            %.2f xfers/IO, %.2f bytes/xfer)\n"
             "SPI max clock: %lu kHz, min clock: %lu kHz, slowdowns: %lu\n"
             "****************************************************************************\n",
             fv.version_str, fv.snapshot_str,
-            (long)spi_stats.tv_open.tv_sec, (long)spi_stats.tv_open.tv_usec / 10000,
-            (long)spi_stats.tv_xfer.tv_sec, (long)spi_stats.tv_xfer.tv_usec / 10000, xfer_pct,
+            (int64_t)spi_stats.tv_open.tv_sec, (int64_t)spi_stats.tv_open.tv_usec / 10000,
+            (int64_t)spi_stats.tv_xfer.tv_sec, (int64_t)spi_stats.tv_xfer.tv_usec / 10000, xfer_pct,
             spi_stats.reads, spi_stats.read_bytes, avg_read,
             spi_stats.writes, spi_stats.write_bytes, avg_write,
             rate, spi_stats.read_bytes + spi_stats.write_bytes,
-                (long)spi_stats.tv_xfer.tv_sec, (long)spi_stats.tv_xfer.tv_usec / 10000,
+                (int64_t)spi_stats.tv_xfer.tv_sec, (int64_t)spi_stats.tv_xfer.tv_usec / 10000,
             iops, spi_stats.reads + spi_stats.writes,
-                (long)spi_stats.tv_xfer.tv_sec, (long)spi_stats.tv_xfer.tv_usec / 10000,
+                (int64_t)spi_stats.tv_xfer.tv_sec, (int64_t)spi_stats.tv_xfer.tv_usec / 10000,
             ftdi_type_str, ftdic.type, ftdi_buf_size,
             ftdi_rate, ftdi_short_rate, spi_stats.ftdi_xfers,
-                spi_stats.ftdi_short_reads, (long)spi_stats.tv_xfer.tv_sec,
-                (long)spi_stats.tv_xfer.tv_usec / 10000, ftdi_xfers_per_io, avg_ftdi_xfer,
+                spi_stats.ftdi_short_reads, (int64_t)spi_stats.tv_xfer.tv_sec,
+                (int64_t)spi_stats.tv_xfer.tv_usec / 10000, ftdi_xfers_per_io, avg_ftdi_xfer,
             spi_stats.spi_clock_max, spi_stats.spi_clock_min, spi_stats.slowdowns
     );
 }
