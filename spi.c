@@ -945,7 +945,9 @@ void spi_output_stats(void)
     /* Casting time_t type variables to int64_t because Wine MSVCRT still has
      * 32 bit time_t, unlike newer versions of MinGW. */
     fprintf(fp,
-            "*** FTDI Statistics ********************************************************\n"
+            "```\n"
+            "FTDI Statistics\n"
+            "\n"
             "csr-spi-ftdi version: " VERSION " (git rev " GIT_REVISION ")\n"
             "libftdi version: %s-%s\n"
             "Time open: %" PRId64 ".%02" PRId64 " s\n"
@@ -959,7 +961,7 @@ void spi_output_stats(void)
             "            %ld xfers/%ld short reads in %" PRId64 ".%02" PRId64 " s,\n"
             "            %.2f xfers/IO, %.2f bytes/xfer)\n"
             "SPI max clock: %lu kHz, min clock: %lu kHz, slowdowns: %lu\n"
-            "****************************************************************************\n",
+            "```\n",
             fv.version_str, fv.snapshot_str,
             (int64_t)spi_stats.tv_open.tv_sec, (int64_t)spi_stats.tv_open.tv_usec / 10000,
             (int64_t)spi_stats.tv_xfer.tv_sec, (int64_t)spi_stats.tv_xfer.tv_usec / 10000, xfer_pct,
