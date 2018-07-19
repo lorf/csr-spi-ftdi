@@ -64,6 +64,7 @@ static struct ftdi_device_ids ftdi_device_ids[] = {
     { 0x0403, 0x6011, "FT4232" }, /* FT4232H */
     { 0x0403, 0x6014, "FT232H" }, /* FT232H */
     /*{ 0x0403, 0x6015, "FT230X" },*/ /* FT230X, only since libftdi1-1.2 */
+    { 0x10c4, 0xea60, "CP210x" }, /* CP210x */
 };
 
 static char *spi_err_buf = NULL;
