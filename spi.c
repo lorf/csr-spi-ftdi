@@ -836,7 +836,7 @@ int spi_open(int nport)
 
     /* If pinout was not set via spi_set_pinout() */
     if (!spi_pinout_set)
-        spi_set_pinout(SPI_PINOUT_HWSPI);
+        spi_set_pinout(SPI_PINOUT_DEFAULT);
 
     /* Set pins direction */
     output_pins = spi_pins->mosi | spi_pins->clk | spi_pins->ncs;
