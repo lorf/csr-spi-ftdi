@@ -96,15 +96,9 @@ DLLEXPORT int DLLEXPORT spifns_init() {
     if (spifns_init_vars_from_env() < 0)
         return -1;
 
-    if (!spifns_api_version) {
-        if (pttrans_api_version)
-            spifns_api_version = pttrans_api_version;
-        else
-            spifns_api_version = SPIFNS_API_1_4;
-    }
-
-    LOG(INFO, "Detected SPI API version 0x%04x, using version 0x%04x",
-            pttrans_api_version, spifns_api_version);
+	/* Initialize spifns_api_version, in BlueSuite 2.3 spifns_init is called
+	 * before spifns_get_version. */
+	(void)spifns_get_version();
 
     if (spi_init() < 0)
         return -1;
@@ -162,10 +156,15 @@ DLLEXPORT void spifns_set_debug_callback(spifns_debug_callback pCallback) {
 /* In BlueSuite 2.6 this is called before spifns_init(), in BlueSuite 2.3 - after. */
 DLLEXPORT uint32_t spifns_get_version() {
     if (!spifns_api_version) {
-        if (pttrans_api_version)
-            spifns_api_version = pttrans_api_version;
-        else
+        spifns_api_version = spifns_detect_api_version();
+        if (spifns_api_version) {
+            LOG(INFO, "Detected SPI API version 0x%04x",
+                    spifns_api_version);
+        } else {
             spifns_api_version = SPIFNS_API_1_4;
+            LOG(INFO, "Can't detect SPI API version, using default 0x%04x",
+                    spifns_api_version);
+        }
     }
 
     return spifns_api_version;

@@ -3,29 +3,32 @@
 
 typedef uint32_t (pttrans_get_version_t)(void);
 
-/* Public variable */
-uint32_t pttrans_api_version = 0;
-
-BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
+uint32_t spifns_detect_api_version(void)
 {
+    static uint32_t pttrans_api_version = 0;
+
     HMODULE pttdll;
     pttrans_get_version_t *pttrans_get_version;
 
+    if (!pttrans_api_version) {
+        /* Detect SPI API version by calling a function from pttransport.dll */
+        pttdll = GetModuleHandle("pttransport.dll");
+        if (pttdll) {
+            pttrans_get_version = (pttrans_get_version_t *)GetProcAddress(pttdll,
+                            "pttrans_get_version");
+            if (pttrans_get_version)
+                pttrans_api_version = pttrans_get_version();
+        }
+    }
+    return pttrans_api_version;
+}
+
+BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
+{
     switch (fdwReason)
     {
         case DLL_PROCESS_ATTACH:
             DisableThreadLibraryCalls(hinstDLL);
-
-            /* Detect SPI API version by calling a function from pttransport.dll */
-            if ((pttdll = GetModuleHandle("pttransport.dll"))) {
-                if ((pttrans_get_version = (pttrans_get_version_t *)GetProcAddress(pttdll,
-                                "pttrans_get_version")))
-                {
-                    pttrans_api_version = pttrans_get_version();
-                    pttrans_get_version = NULL;
-                    pttdll = NULL;
-                }
-            }
             break;
         case DLL_PROCESS_DETACH:
             spi_deinit();
