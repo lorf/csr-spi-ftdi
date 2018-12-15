@@ -7,6 +7,9 @@
 
 set -xe
 
+# Set default build target
+[ "$*" ] || set -- zip
+
 LIBUSB_VERSION="1.0.22"
 LIBFTDI1_VERSION="1.4"
 LIBFTDI1_CMAKE_OPTS="-DBUILD_TESTS=OFF -DDOCUMENTATION=OFF -DFTDI_EEPROM=OFF -DEXAMPLES=OFF -DPYTHON_BINDINGS=OFF -DLINK_PYTHON_LIBRARY=OFF"
@@ -59,6 +62,4 @@ fi
 
 ln -snf "cache/linux/libftdi1-$LIBFTDI1_VERSION" libftdi1-linux
 
-make zip
-
-ls -l release/csr-spi-ftdi-*.zip
+make "$@"
