@@ -798,7 +798,7 @@ int spi_open(int nport)
             break;
         case TYPE_2232C:
             ftdi_type_str = "FT2232C/D";
-            ftdi_buf_size = 512;
+            ftdi_buf_size = 384;
             break;
         case TYPE_R:
             ftdi_type_str = "FT232R";
