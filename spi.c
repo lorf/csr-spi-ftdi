@@ -697,7 +697,7 @@ int spi_open(int nport)
         return 0;
     }
 
-    if (spi_nports == 0 || nport < spi_nports - 1) {
+    if (spi_nports == 0 || nport >= spi_nports) {
         SPI_ERR("No FTDI device found");
         goto open_err;
     }
