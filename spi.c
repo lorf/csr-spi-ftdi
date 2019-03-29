@@ -697,7 +697,7 @@ int spi_open(int nport)
         return 0;
     }
 
-    if (spi_nports == 0 || nport < spi_nports - 1) {
+    if (spi_nports == 0 || nport >= spi_nports) {
         SPI_ERR("No FTDI device found");
         goto open_err;
     }
@@ -779,7 +779,7 @@ int spi_open(int nport)
      * http://developer.intra2net.com/mailarchive/html/libftdi/2011/msg00413.html
      * http://jdelfes.blogspot.ru/2014/03/ft232r-bitbang-spi-part-2.html
      *
-     * FT2232C has 128 byte TX and 384 byte RX buffers per channel.
+     * FT2232C has 384 byte TX+RX buffer per channel.
      * FT2232H has 4kB RX and TX buffers per channel.
      * FT4232H has 2kB RX and TX buffers per channel.
      * FT232H has 1 kB RX and TX buffers.
@@ -798,7 +798,7 @@ int spi_open(int nport)
             break;
         case TYPE_2232C:
             ftdi_type_str = "FT2232C/D";
-            ftdi_buf_size = 512;
+            ftdi_buf_size = 384;
             break;
         case TYPE_R:
             ftdi_type_str = "FT232R";
